@@ -1,3 +1,5 @@
+require('dotenv').config({ path: `.env.development.local` })
+
 const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
@@ -5,35 +7,48 @@ const cors = require('cors');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const jwt = require('jsonwebtoken');
+const bodyParser = require('body-parser');
+const passport = require('passport');
+const passportLocal = require('passport-local').Strategy;
 
 const authMiddleware = require('./authMiddleware');
 
-const app = express();
 const PORT = process.env.PORT ? process.env.PORT : 5000;
+const CLIENT_URL = process.env.CLIENT_URL;
+const SESSION_SECRET = process.env.SESSION_SECRET;
+const MONGO_URI = 'mongodb://127.0.0.1:27017';
+const DB_NAME = 'yummyDB';
 
-require('dotenv').config({ path: `.env.development.local` })
+mongoose.connect(
+  `${MONGO_URI}/${DB_NAME}`,
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  })
+  .then(() => console.log("Mongoose connected"))
+  .catch((err) => console.log(err));
 
 const User = require('./models/User.js');
+const Post = require('./models/Post.js')
+
+const app = express();
 
 app.use(express.json());
-app.use(cookieParser());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(session({
+  secret: SESSION_SECRET,
+  resave: true,
+  saveUninitialized: true
+}))
 
-const SESSION_SECRET = process.env.SESSION_SECRET;
-console.log(SESSION_SECRET);
-// mongo connection
-const mongoURI = 'mongodb://127.0.0.1:27017';
-const dbName = 'yummyDB';
-const collectionName = 'posts';
+app.use(cors({
+  origin: CLIENT_URL,
+  credentials: true
+}));
 
-main().catch(err => console.log(err));
+app.use(cookieParser(SESSION_SECRET));
 
-async function main() {
-  await mongoose.connect(`${mongoURI}/${dbName}`);
-}
-
-app.use(cors());
-
-mongoose.connection.on('connected', () => console.log('connected'));
 
 app.get('/checkToken', authMiddleware, function(req, res) {
   res.sendStatus(200);
@@ -46,7 +61,7 @@ app.post('/posts', async (req, res) => {
 
     const client = await mongodb.MongoClient.connect(mongoURI);
     const db = client.db(dbName);
-    const collection = db.collection(collectionName);
+    const collection = db.collection('posts');
 
     const result = await collection.insertOne({ title, body });
 
@@ -61,15 +76,8 @@ app.post('/posts', async (req, res) => {
 
 // retrieve all posts
 app.get('/posts', async (req, res) => {
-  console.log(req.body);
   try {
-    const client = await mongodb.MongoClient.connect(mongoURI);
-    const db = client.db(dbName);
-    const collection = db.collection(collectionName);
-
-    const posts = await collection.find().toArray();
-
-    client.close();
+    const posts = await Post.find();
 
     res.json(posts);
   } catch (error) {
@@ -77,41 +85,6 @@ app.get('/posts', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
-
-//AUTHENTICATION
-
-const userSchema = new mongoose.Schema({
-  username: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true }
-});
-
-const postSchema = new mongoose.Schema({
-  title: { type: String, required: true},
-  body: { type: String, required: true}
-});
-
-const Post = mongoose.model('Post', postSchema);
-
-app.get('/api/check-auth', async (req, res) => {
-  try {
-    if (req.session.user) {
-      const { id, email } = req.session.user;
-      const user = await User.findById(id);
-      if (user) {
-        res.status(200).json(user);
-      } else {
-        res.status(401).json({ message: 'Invalid session' });
-      }
-    } else {
-      res.status(401).json({ message: 'No session found' });
-    }
-  } catch (error) {
-    console.error('Error checking authentication:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
 
 app.post('/register', function(req, res) {
   const { email, username, password } = req.body;
