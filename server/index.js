@@ -45,6 +45,7 @@ mongoose.connect(
 const User = require('./models/User.js');
 const Post = require('./models/Post.js')
 const Image = require('./models/Image.js')
+const Location = require('./models/Location.js')
 
 const app = express();
 
@@ -71,7 +72,6 @@ app.get('/checkToken', authMiddleware, function(req, res) {
   res.sendStatus(200);
 });
 
-// create post
 app.post('/posts', upload.single('image'), async (req, res) => {
   try {
     const image = new Image({
@@ -81,12 +81,21 @@ app.post('/posts', upload.single('image'), async (req, res) => {
 
     await image.save();
 
+    const location = new Location({
+      latitude: req.body.latitude,
+      longitude: req.body.longitude,
+      addressName: req.body.addressName
+    });
+
+    await location.save();
+
     const { title, body } = req.body;
     const post = new Post({ 
       title: title, 
       body: body, 
       image: image._id, 
-      resolved: false 
+      resolved: false,
+      location: location._id
     });
 
     post.save()
@@ -102,7 +111,7 @@ app.post('/posts', upload.single('image'), async (req, res) => {
 // retrieve all posts
 app.get('/posts', async (req, res) => {
   try {
-    const posts = await Post.find().populate('image').exec()
+    const posts = await Post.find().populate('image').populate('location').exec()
     res.json(posts);
   } catch (error) {
     console.error(error);

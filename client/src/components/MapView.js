@@ -1,15 +1,26 @@
 import { useState, useCallback, memo } from 'react'
-import { GoogleMap, useJsApiLoader } from '@react-google-maps/api';
-console.log(process.env.REACT_APP_MAPS_API_KEY);
+import { GoogleMap, useJsApiLoader, MarkerF, InfoWindow } from '@react-google-maps/api';
 
 const containerStyle = {
-    width: '400px',
-    height: '400px'
+    width: '100%',
+    height: '100vh'
   };
 
 function MapView(props) {
     const latitude = props.latitude || 40.7128;
-    const longitude = props.longitude || 74.0060;
+    const longitude = props.longitude || -74.0060;
+
+    const [selectedMarker, setSelectedMarker] = useState(null);
+
+    console.log(selectedMarker);
+
+    const handleMarkerClick = (marker) => {
+      setSelectedMarker(marker);
+    };
+
+    const handleMapClick = () => {
+      setSelectedMarker(null);
+    };
 
     const { isLoaded } = useJsApiLoader({
         id: 'google-map-script',
@@ -34,6 +45,10 @@ function MapView(props) {
         setMap(null)
     }, [])
 
+    const onLoadMarker = marker => {
+      console.log('marker: ' +  marker.position.lat() + ', ' + marker.position.lng())
+    }
+
     return isLoaded ? (
         <GoogleMap
             mapContainerStyle={containerStyle}
@@ -42,8 +57,23 @@ function MapView(props) {
             onLoad={onLoad}
             onUnmount={onUnmount}
         >
-            {}
-            <></>
+          {
+            props.coordinates.map((coordinate, idx) => 
+              <MarkerF
+                onLoad={onLoadMarker}
+                position={coordinate}
+                onClick={() => handleMarkerClick(idx)}
+                />
+            )
+          }
+        {selectedMarker && (
+              <InfoWindow
+                position={{ lat: props.coordinates[selectedMarker].lat, lng: props.coordinates[selectedMarker].lng }}
+                onCloseClick={() => setSelectedMarker(null)}
+              >
+                <div>{props.posts[selectedMarker].title}</div>
+              </InfoWindow>
+            )}
         </GoogleMap>
     ) : <div>Loading</div>
 }

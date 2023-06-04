@@ -7,6 +7,10 @@ const postSchema = new mongoose.Schema({
     image: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Image'
+    },
+    location: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Location'
     }
 });
 

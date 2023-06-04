@@ -2,31 +2,28 @@ import axios from 'axios'
 import { useState, useEffect } from 'react';
 
 export const useSession = () => {
-  const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     const fetchSession = async () => {
       try {
         const response = await axios('/checkToken');
-        console.log(response.status_code);
-        if (response.status_code === 200) {
-          const user = await response.json();
-          setUser(user);
+        console.log(response);
+        if (response.status === 200) {
           setIsAuthenticated(true);
         } else {
-          setUser(null);
           setIsAuthenticated(false);
         }
       } catch (error) {
         console.error('Error checking authentication:', error);
-        setUser(null);
         setIsAuthenticated(false);
       }
     };
 
     fetchSession();
   }, []);
+
+  console.log("AUTHENTICATED " + isAuthenticated);
 
   // const login = async (email, password) => {
   //   try {
@@ -56,5 +53,5 @@ export const useSession = () => {
   //   }
   // };
 
-  return { user, isAuthenticated};
+  return {  isAuthenticated};
 };

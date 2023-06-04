@@ -10,7 +10,7 @@ import { useSession } from '../hooks/useSession'
 import { AllPosts } from '../components/AllPosts'
 
 export function Home() {
-	const { user, login, logout } = useSession();
+	const { isAuthenticated } = useSession();
 
 	const [isPopupOpen, setPopupOpen] = useState(false);
 
@@ -24,11 +24,18 @@ export function Home() {
 
 
 	return (
-		<div className="pt-10">
-			<button onClick={handleOpenPopup}> open popup </button>
+		<div className="pt-4 flex flex-col items-center">
+			{isAuthenticated &&
+			<button
+				className="px-4 py-2 mb-4 text-white bg-[#658354] font-bold rounded shadow-xl"
+				onClick={handleOpenPopup}
+			>
+				Create Post
+      		</button> }
 			{isPopupOpen && <CreatePostPopup onClose={ handleClosePopup}/>}
 			
 			<AllPosts/>
+			<div className="bg-[#DDEAD1] h-16"/>
 		</div>
 	)
 }

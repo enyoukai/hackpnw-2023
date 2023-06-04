@@ -1,5 +1,5 @@
 import { Link, NavLink } from 'react-router-dom'
-import logo from '../logo.png'
+import logo from '../yummylogo.PNG'
 import { useSession } from '../hooks/useSession';
 
 export function Header() { 
@@ -8,7 +8,7 @@ export function Header() {
 	console.log(isAuthenticated);
 
 	return (
-		<header className="flex flex-row justify-between border border-gray-300 px-80">
+		<header className="flex flex-row justify-between px-80">
 			<div className="flex flex-row gap-10">
 				<Link to="/" className="w-40 my-auto">
 					<img src={logo} className='w-full h-auto'/>
@@ -20,13 +20,13 @@ export function Header() {
 			</div>
 			{
 				isAuthenticated ? 
-				<div className="w-10">
-					<img className="rounded-full align-middle" src="https://i1.sndcdn.com/avatars-Why2guyttlTy7IKw-P2j7wA-t240x240.jpg"/>
+				<div className="flex flex-row w-10 justify-center items-center">
+					<img className="justify-center items-center rounded-full" src="https://i1.sndcdn.com/avatars-Why2guyttlTy7IKw-P2j7wA-t240x240.jpg"/>
 				</div> :
 				<div className="flex flex-row gap-10 my-auto">
-									<NavLink className={({ isActive }) => `text-lg font-semibold ${isActive ? 'text-gray-800' : 'text-gray-500'}`} to='login'>Log In</NavLink>
-								<NavLink className={({ isActive }) => `text-lg font-semibold ${isActive ? 'text-gray-800' : 'text-gray-500'}`} to='register'>Register</NavLink>
-			</div>
+					<NavLink className={({ isActive }) => `text-lg font-semibold ${isActive ? 'text-gray-800' : 'text-gray-500'}`} to='login'>Log In</NavLink>
+					<NavLink className={({ isActive }) => `text-lg font-semibold ${isActive ? 'text-gray-800' : 'text-gray-500'}`} to='register'>Register</NavLink>
+				</div>
 			}
 		</header>
 	);

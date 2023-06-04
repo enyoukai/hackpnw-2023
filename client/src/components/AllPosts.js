@@ -22,7 +22,7 @@ export function AllPosts() {
     return(
         <div className="flex flex-col gap-10">
 				{posts.map((post) => 
-					<Post id={post.id} title={post.title} body={post.body} image={post.image}/>
+					<Post id={post.id} title={post.title} body={post.body} image={post.image} location={post.location}/>
 				)}
         </div>
     )

@@ -3,7 +3,7 @@ module.exports = {
   content: ["./src/**/*.{html,js}"],
   theme: {
     fontFamily: {
-      sans: ['Open Sans', 'sans-serif']
+      sans: ['Helvetica', 'sans-serif']
     }
   },
   plugins: [],

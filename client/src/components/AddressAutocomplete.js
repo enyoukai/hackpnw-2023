@@ -1,19 +1,20 @@
 import Autocomplete from "react-google-autocomplete";
 
-const AddressAutocomplete = () => {
-	const API_KEY = console.log(process.env.REACT_APP_MAPS_API_KEY);
+const AddressAutocomplete = (props) => {
+	const API_KEY = process.env.REACT_APP_MAPS_API_KEY;
+	console.log(API_KEY);
 	return (
 		<Autocomplete
 			apiKey={API_KEY}
-			style={{ width: "90%" }}
-			onPlaceSelected={(place) => {
-				console.log(place);
-			}}
+			style={{ width: "90%", "background-color": "#DDEAD1" }}
+			onPlaceSelected={props.onPlaceSelected}
 			options={{
-				types: ["(regions)"],
-				componentRestrictions: { country: "ru" },
+				componentRestrictions: { country: "us" },
+				fields: ["address_components", "geometry", "icon", "name"],
+				types: ["street_address", "street_number"],
+
 			}}
-			defaultValue="Amsterdam"
+			defaultValue="Seattle"
 		/>
 	);
 };
