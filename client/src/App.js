@@ -3,7 +3,7 @@ import { Route, Routes } from "react-router-dom"
 import { Home } from "./pages/Home"
 import { PostPage } from "./pages/PostPage"
 import { About } from "./pages/About"
-import { SignIn } from "./pages/SignIn"
+import { Login } from "./pages/Login"
 import { Register } from "./pages/Register"
 
 
@@ -16,7 +16,7 @@ function App() {
         <Route index element={<Home/>}/>
         <Route path="/posts/:postId" element={<PostPage/>}/>
         <Route path="/about" element={<About/>}/>
-        <Route path="/signin" element={<SignIn/>}/>
+        <Route path="/login" element={<Login/>}/>
         <Route path="/register" element={<Register/>}/>
       </Route>
     </Routes>

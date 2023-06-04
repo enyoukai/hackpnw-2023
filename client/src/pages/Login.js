@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 
-export function SignIn()
+export function Login()
 {
 	const [loginData, setLoginData] = useState({
 		email: '',
@@ -16,13 +16,17 @@ export function SignIn()
 	
 	const handleLoginSubmit = (e) => {
 		e.preventDefault();
-		axios.post('http://localhost:3000/login', loginData)
-		.then((response) => {
-			console.log(response.data);
-		})
-		.catch((error) => {
-			console.error(error.response.data);
-		});
+		axios.post('/authenticate', loginData)
+			.then((response) => {
+				console.log(response.data);
+				localStorage.setItem('user', JSON.stringify(response.data.user));
+				localStorage.setItem('isLoggedIn', true);
+				window.location.href='/';
+				
+			})
+			.catch((error) => {
+				console.error(error.response.data);
+			});
 	};
 	
 

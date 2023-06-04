@@ -10,11 +10,11 @@ export function Header() {
 				</Link>
 				<nav className="py-4 flex flex-row justify-around gap-10">
 					<NavLink className={({ isActive }) => `text-lg font-semibold ${isActive ? 'text-gray-800' : 'text-gray-500'}`} to='/'>Home</NavLink>
-					<NavLink className={({ isActive }) => `text-lg font-semibold ${isActive ? 'text-gray-800' : 'text-gray-500'}`} to='about'>Browse</NavLink>
+					<NavLink className={({ isActive }) => `text-lg font-semibold ${isActive ? 'text-gray-800' : 'text-gray-500'}`} to='about'>Discover</NavLink>
 				</nav>
 			</div>
 			<div className="flex flex-row gap-10 my-auto">
-				<NavLink className={({ isActive }) => `text-lg font-semibold ${isActive ? 'text-gray-800' : 'text-gray-500'}`} to='signin'>Sign In</NavLink>
+				<NavLink className={({ isActive }) => `text-lg font-semibold ${isActive ? 'text-gray-800' : 'text-gray-500'}`} to='login'>Log In</NavLink>
 				<NavLink className={({ isActive }) => `text-lg font-semibold ${isActive ? 'text-gray-800' : 'text-gray-500'}`} to='register'>Register</NavLink>
 			</div>
 		</header>
