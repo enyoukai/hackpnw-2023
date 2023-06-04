@@ -1,18 +1,19 @@
-import {useState, useCallback} from 'react'
+import React, {useState, useCallback} from 'react'
 import {useDropzone} from 'react-dropzone';
 import axios from 'axios';
+
+import AddressAutocomplete from './AddressAutocomplete'
 
 export function CreatePostPopup({ onClose }) {
     const [uploadedImage, setUploadedImage] = useState(null);
     const [postData, setPostData] = useState({
         title: '',
-        body: ''
+        body: '',
     });  
 
     const onDrop = useCallback(acceptedFiles => {
-        setUploadedImage(URL.createObjectURL(acceptedFiles[0]));
-    // Do something with the files
-    }, [])
+        setUploadedImage((acceptedFiles[0]))}
+    , []);
 
     const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop})
 
@@ -22,13 +23,24 @@ export function CreatePostPopup({ onClose }) {
 
 	};
 
-    async function handleSubmit(e)
+    async function handleSubmit(event)
     {
-        e.preventDefault();
+        event.preventDefault();
+        const data = new FormData();
+
+        data.append('image', uploadedImage);
+        for (const [key, value] of Object.entries(postData)) {
+            data.append(key, value);
+        }
 
         try {
-            const response = await axios.post('/posts', postData);
-            console.log(response.data);
+
+            const response = await axios.post('/posts', data, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+
             setUploadedImage(null);
             setPostData({ title: '', body: '' });
             onClose();
@@ -48,7 +60,7 @@ export function CreatePostPopup({ onClose }) {
                 <div className="flex flex-row ">
                     <div className="w-1/2" {...getRootProps()}>
                         <input {...getInputProps()} /> 
-                            {uploadedImage ? <img src={uploadedImage}/> :
+                            {uploadedImage ? <img src={URL.createObjectURL(uploadedImage)}/> :
                             <img src="https://cdn1.iconfinder.com/data/icons/business-company-1/500/image-512.png"/>}
                     </div>
                     <div className="px-3 py-4 w-1/2 flex flex-col gap-5">
@@ -58,6 +70,7 @@ export function CreatePostPopup({ onClose }) {
                         </div>
                         <input name="title" value={postData.title} onChange={handlePostChange} className="w-full border-none outline-none" placeholder="Title"/>
                         <textarea name="body" value={postData.body} onChange={handlePostChange} className="w-full border-none outline-none resize-none h-40" placeholder="Put some more info here"/>
+                        <AddressAutocomplete/>
                     </div>
                 </div>
             </form>

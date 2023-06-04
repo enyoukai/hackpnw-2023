@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom'
 import axios from 'axios';
 
 export function Login()
@@ -7,6 +8,8 @@ export function Login()
 		email: '',
 		password: ''
 	});
+
+	const navigate = useNavigate();
 
 	const handleLoginChange = (e) => {
 		const { name, value } = e.target;
@@ -18,11 +21,9 @@ export function Login()
 		e.preventDefault();
 		axios.post('/authenticate', loginData)
 			.then((response) => {
-				console.log(response.data);
 				localStorage.setItem('user', JSON.stringify(response.data.user));
 				localStorage.setItem('isLoggedIn', true);
-				window.location.href='/';
-				
+				navigate('/');				
 			})
 			.catch((error) => {
 				console.error(error.response.data);

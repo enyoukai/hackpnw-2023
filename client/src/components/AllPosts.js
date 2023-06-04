@@ -12,6 +12,7 @@ export function AllPosts() {
     async function fetchPosts() {
         try {
             const response = await axios.get('/posts');
+            console.log(response.data);
             setPosts(response.data);
         } catch(error) {
             console.error('Error fetching posts: ', error);
@@ -20,9 +21,9 @@ export function AllPosts() {
 
     return(
         <div className="flex flex-col gap-10">
-				{ posts.map((post) => 
-					<Post id={post.id} title={post.title} body={post.body}/>
-				) }
+				{posts.map((post) => 
+					<Post id={post.id} title={post.title} body={post.body} image={post.image}/>
+				)}
         </div>
     )
 }

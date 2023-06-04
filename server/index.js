@@ -10,6 +10,7 @@ const jwt = require('jsonwebtoken');
 const bodyParser = require('body-parser');
 const passport = require('passport');
 const passportLocal = require('passport-local').Strategy;
+const multer = require('multer');
 
 const authMiddleware = require('./authMiddleware');
 
@@ -18,6 +19,19 @@ const CLIENT_URL = process.env.CLIENT_URL;
 const SESSION_SECRET = process.env.SESSION_SECRET;
 const MONGO_URI = 'mongodb://127.0.0.1:27017';
 const DB_NAME = 'yummyDB';
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    // Set the destination directory where uploaded images will be saved
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    // Set the filename to be used for the saved image
+    cb(null, Date.now() + '-' + file.originalname);
+  },
+});
+
+const upload = multer({ storage });
 
 mongoose.connect(
   `${MONGO_URI}/${DB_NAME}`,
@@ -30,8 +44,11 @@ mongoose.connect(
 
 const User = require('./models/User.js');
 const Post = require('./models/Post.js')
+const Image = require('./models/Image.js')
 
 const app = express();
+
+app.use(express.static('uploads'));
 
 app.use(express.json());
 app.use(bodyParser.json());
@@ -55,30 +72,37 @@ app.get('/checkToken', authMiddleware, function(req, res) {
 });
 
 // create post
-app.post('/posts', async (req, res) => {
+app.post('/posts', upload.single('image'), async (req, res) => {
   try {
+    const image = new Image({
+      filename: req.file.filename,
+      filePath: req.file.path
+    })
+
+    await image.save();
+
     const { title, body } = req.body;
+    const post = new Post({ 
+      title: title, 
+      body: body, 
+      image: image._id, 
+      resolved: false 
+    });
 
-    const client = await mongodb.MongoClient.connect(mongoURI);
-    const db = client.db(dbName);
-    const collection = db.collection('posts');
+    post.save()
 
-    const result = await collection.insertOne({ title, body });
-
-    client.close();
-
-    res.status(201).json(result);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
+    return res.status(200).send('Post created successfully');
+  }
+  catch(err) {
+    console.error(err);
+    return res.status(500).send('Internal server error');
   }
 });
 
 // retrieve all posts
 app.get('/posts', async (req, res) => {
   try {
-    const posts = await Post.find();
-
+    const posts = await Post.find().populate('image').exec()
     res.json(posts);
   } catch (error) {
     console.error(error);
@@ -91,12 +115,18 @@ app.post('/register', function(req, res) {
   const user = new User({ username, email, password });
   user.save().
     then(function () {
-      return res.sendStatus(200);
+        const payload = { email };
+        const token = jwt.sign(payload, SESSION_SECRET, {
+          expiresIn: '1h'
+        });
+        res.cookie('token', token, { httpOnly: true })
+          .sendStatus(200);
+      
     }).catch(function (err) {
       console.log(err);
       return res.sendStatus(500);
     })
-  });
+});
 
 app.post('/authenticate', function(req, res) {
   const { email, password } = req.body;

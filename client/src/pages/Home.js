@@ -10,8 +10,6 @@ import { useSession } from '../hooks/useSession'
 import { AllPosts } from '../components/AllPosts'
 
 export function Home() {
-	const posts = [{id: 1, title: "ra", body: "ra"}, {id: 2, title: "gra", body: "gra"}, {id: 3, title: "ah", body: "ah"}];
-
 	const { user, login, logout } = useSession();
 
 	const [isPopupOpen, setPopupOpen] = useState(false);
@@ -26,16 +24,7 @@ export function Home() {
 
 
 	return (
-		<div clasName="pt-10">
-			{user ? (
-				<div>
-					<p>Welcome, {user.username}!</p>
-				</div>
-			) : (
-				<div>
-					<p>Please login to continue.</p>
-				</div>
-			)}
+		<div className="pt-10">
 			<button onClick={handleOpenPopup}> open popup </button>
 			{isPopupOpen && <CreatePostPopup onClose={ handleClosePopup}/>}
 			

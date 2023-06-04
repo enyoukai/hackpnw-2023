@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom'
 
 export function Register()
 {
@@ -8,6 +9,8 @@ export function Register()
 		email: '',
 		password: ''
 	});
+
+	const navigate = useNavigate();
 
 	const handleRegisterChange = (e) => {
 		const { name, value } = e.target;
@@ -20,6 +23,7 @@ export function Register()
 		axios.post('/register', registerData)
 			.then((response) => {
 				console.log(response.data);
+				navigate('/');
 			})	
 			.catch((error) => {
 				console.error(error.response.data);
