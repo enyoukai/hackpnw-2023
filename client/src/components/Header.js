@@ -5,8 +5,6 @@ import { useSession } from '../hooks/useSession';
 export function Header() { 
 	const { isAuthenticated } = useSession();
 
-	console.log(isAuthenticated);
-
 	return (
 		<header className="flex flex-row justify-between px-80">
 			<div className="flex flex-row gap-10">
